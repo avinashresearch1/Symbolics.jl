@@ -1,0 +1,101 @@
+"""
+Reusable thermal components used in the disc brake model.
+"""
+partial model ThermalElement begin
+  port = ThermalPort()
+end
+
+partial model ThermalTwoPort begin
+  hot = ThermalPort()
+  cold = ThermalPort()
+end
+
+model ThermalMass begin
+  extends ThermalElement()
+  "Heat capacity of the lumped mass"
+  parameter C::HeatCapacity
+  "Initial temperature of the mass"
+  parameter T_start::Temperature = 293.15
+relations
+  C * der(port.T) = port.Q
+  initial port.T = T_start
+end
+
+model ThermalResistance begin
+  extends ThermalTwoPort()
+  "Thermal resistance between the two nodes"
+  parameter R::ThermalResistance
+relations
+  hot.Q = -(hot.T - cold.T) / R
+  cold.Q = -hot.Q
+end
+
+model ThermalConductance begin
+  extends ThermalTwoPort()
+  "Thermal conductance between the two nodes"
+  parameter G::ThermalConductance
+relations
+  hot.Q = -G * (hot.T - cold.T)
+  cold.Q = -hot.Q
+end
+
+model ConvectiveInterface begin
+  surface = ThermalPort()
+  ambient = ThermalPort()
+  parameter h::HeatTransferCoefficient
+  parameter A::Area
+relations
+  surface.Q = h * A * (ambient.T - surface.T)
+  ambient.Q = -surface.Q
+end
+
+model Ambient begin
+  port = ThermalPort()
+  parameter T::Temperature = 293.15
+relations
+  port.T = T
+end
+
+model Rotor begin
+  extends ThermalMass(C=12000, T_start=293.15)
+end
+
+model BrakePad begin
+  extends ThermalMass(C=4500, T_start=293.15)
+end
+
+model FrictionHeatSource begin
+  rotor = ThermalPort()
+  pad = ThermalPort()
+  "Coefficient of friction between pad and rotor"
+  parameter mu::Real = 0.35
+  "Normal clamp force exerted by the caliper"
+  parameter normal_force::Force = 4000
+  "Effective friction radius of the rotor"
+  parameter effective_radius::Length = 0.15
+  "Angular velocity of the rotor"
+  parameter omega::AngularVelocity = 80
+  "Mechanical-to-heat conversion efficiency"
+  parameter efficiency::Real = 1.0
+  "Fraction of the dissipated power routed into the rotor"
+  parameter rotor_fraction::Fraction = 0.9
+  "Optional scaling applied to the resulting friction power"
+  parameter modulation::Real(min=0) = 1.0
+  constant brake_torque::Torque = mu * normal_force * effective_radius
+  constant total_power::Power = efficiency * brake_torque * omega * modulation
+relations
+  rotor.Q = rotor_fraction * total_power
+  pad.Q = (1 - rotor_fraction) * total_power
+end
+
+model ThermalContact begin
+  extends ThermalResistance(R=0.0015)
+end
+
+model RotorConvection begin
+  extends ConvectiveInterface(h=75, A=0.28)
+end
+
+model PadConvection begin
+  extends ConvectiveInterface(h=55, A=0.18)
+end

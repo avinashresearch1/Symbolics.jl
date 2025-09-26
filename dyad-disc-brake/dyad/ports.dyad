@@ -1,0 +1,12 @@
+"""
+Connector definitions for thermal interactions.
+"""
+connector ThermalPort begin
+  potential T::Temperature
+  flow Q::HeatFlowRate
+  metadata {
+    "Dyad": {
+      "pathStyle": "stroke:#d95f02;stroke-width:2.5;stroke-opacity:1"
+    }
+  }
+end

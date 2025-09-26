@@ -1,0 +1,4 @@
+# Generated Julia code from Dyad CLI is placed here.
+# Keep this directory in version control but ignore generated files.
+*.jl
+!README.md
