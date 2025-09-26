@@ -1,0 +1,29 @@
+"""
+Complete disc brake thermal assembly connecting reusable components.
+"""
+model DiscBrakeThermal begin
+  rotor = Rotor()
+  pad = BrakePad()
+  contact = ThermalContact()
+  rotor_convection = RotorConvection()
+  pad_convection = PadConvection()
+  ambient = Ambient(T=293.15)
+  friction = FrictionHeatSource(mu=0.38, normal_force=4500, effective_radius=0.16,
+                                omega=120, rotor_fraction=0.92, modulation=1.0)
+connections
+  connect(rotor.port, contact.hot, rotor_convection.surface, friction.rotor)
+  connect(pad.port, contact.cold, pad_convection.surface, friction.pad)
+  connect(ambient.port, rotor_convection.ambient, pad_convection.ambient)
+metadata {
+  "Dyad": {
+    "experiments": {
+      "baseline": {
+        "stop": 30,
+        "result": {
+          "signals": ["rotor.port.T", "pad.port.T"]
+        }
+      }
+    }
+  }
+}
+end

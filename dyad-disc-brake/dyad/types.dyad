@@ -1,0 +1,19 @@
+"""
+Unit definitions specific to the disc brake thermal model.
+"""
+type Temperature = Real(units="K", displayUnits="degC")
+type TemperatureDifference = Real(units="K")
+type HeatFlowRate = Real(units="W")
+type HeatCapacity = Real(units="J/K")
+type ThermalResistance = Real(units="K/W")
+type ThermalConductance = Real(units="W/K")
+type HeatTransferCoefficient = Real(units="W/(m2.K)")
+type Area = Real(units="m2")
+type Mass = Real(units="kg")
+type SpecificHeatCapacity = Real(units="J/(kg.K)")
+type Length = Real(units="m")
+type Torque = Real(units="N.m")
+type AngularVelocity = Real(units="rad/s")
+type Force = Real(units="N")
+type Power = Real(units="W")
+type Fraction = Real(units="1", min=0, max=1)

@@ -1,0 +1,3 @@
+# Manifest intentionally left blank.
+# Run `julia --project=. -e 'using Pkg; Pkg.instantiate()'` to generate the
+# dependency manifest for this sample.
